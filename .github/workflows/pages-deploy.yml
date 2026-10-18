@@ -33,12 +33,12 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.3'
-          bundle-cache: true
+          bundler-cache: true # 💡 bundler-cache로 오타 수정 완료!
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24' # 💡 깃허브 최신 기준인 Node 24로 업그레이드!
 
       - name: Update Platform and Install Dependencies
         run: |
