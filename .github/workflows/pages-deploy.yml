@@ -21,7 +21,8 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # 💡 최신 버전 충돌을 피하기 위해 안정적인 ubuntu-24.04 버전으로 강제 고정합니다.
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout
@@ -33,12 +34,12 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.3'
-          bundler-cache: true # 💡 bundler-cache로 오타 수정 완료!
+          bundler-cache: true
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '24' # 💡 깃허브 최신 기준인 Node 24로 업그레이드!
+          node-version: '24'
 
       - name: Update Platform and Install Dependencies
         run: |
@@ -57,7 +58,7 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04 # 💡 여기도 서버 버전을 똑같이 안전한 버전으로 맞춥니다.
     needs: build
     steps:
       - name: Deploy to GitHub Pages
