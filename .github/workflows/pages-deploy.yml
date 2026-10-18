@@ -34,6 +34,8 @@ jobs:
           # submodules: true
           # If using the 'assets' git submodule from Chirpy Starter, uncomment above
           # (See: https://github.com/cotes2020/chirpy-starter/tree/main/assets)
+      - name: Update platform
+        run: bundle lock --add-platform x86_64-linux
 
       - name: Setup Pages
         id: pages
