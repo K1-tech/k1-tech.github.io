@@ -26,7 +26,198 @@
     {{- site.data.locales[include.lang].meta | replace: ':PLATFORM', '<a href="https://jekyllrb.com" target="_blank" rel="noopener">Jekyll</a>' | replace: ':THEME', '<a href="https://github.com/cotes2020/jekyll-theme-chirpy" target="_blank" rel="noopener">Chirpy</a>' -}}
   </p>
 </footer>
+<!-- Panda City Runner Mini-Game -->
+<div id="panda-game-container" style="
+  margin: 24px auto 12px auto;
+  max-width: 100%;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 10px 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  text-align: center;
+">
+  <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #444; margin-bottom: 6px; font-family: monospace;">
+    <span>🐼 <b>Panda Runner</b> (Click or Space to Jump)</span>
+    <span>HI: <b id="panda-hi-score">0000</b> | SCORE: <b id="panda-score">0000</b></span>
+  </div>
+  <canvas id="panda-canvas" width="600" height="110" style="
+    width: 100%;
+    height: 110px;
+    display: block;
+    background: linear-gradient(to bottom, #eef7f2 0%, #ffffff 85%, #d8e2dc 85%, #d8e2dc 100%);
+    border-radius: 8px;
+    cursor: pointer;
+  "></canvas>
+</div>
 
+<script>
+  (function () {
+    const canvas = document.getElementById('panda-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const scoreEl = document.getElementById('panda-score');
+    const hiScoreEl = document.getElementById('panda-hi-score');
+
+    let isRunning = false;
+    let isGameOver = false;
+    let isFocused = false;
+    let score = 0;
+    let hiScore = parseInt(localStorage.getItem('panda-runner-hi') || '0', 10);
+    hiScoreEl.textContent = String(hiScore).padStart(4, '0');
+
+    const groundY = 93;
+    const panda = { x: 45, y: groundY, vy: 0, gravity: 0.65, jumpPower: -10.5, grounded: true, frame: 0 };
+    let buildings = [];
+    let speed = 4.2;
+    let spawnTimer = 0;
+
+    function resetGame() {
+      buildings = [];
+      score = 0;
+      speed = 4.2;
+      spawnTimer = 0;
+      panda.y = groundY;
+      panda.vy = 0;
+      panda.grounded = true;
+      isGameOver = false;
+      isRunning = true;
+    }
+
+    function jump() {
+      if (!isRunning || isGameOver) {
+        resetGame();
+        return;
+      }
+      if (panda.grounded) {
+        panda.vy = panda.jumpPower;
+        panda.grounded = false;
+      }
+    }
+
+    // 마우스 클릭 / 모바일 터치
+    canvas.addEventListener('pointerdown', function (e) {
+      e.preventDefault();
+      isFocused = true;
+      jump();
+    });
+
+    // 다른 곳 클릭 시 키보드 포커스 해제 (블로그 스크롤 방해 방지)
+    document.addEventListener('pointerdown', function (e) {
+      if (e.target !== canvas) isFocused = false;
+    });
+
+    // 스페이스바 / 위쪽 화살표
+    window.addEventListener('keydown', function (e) {
+      if (isFocused && (e.code === 'Space' || e.code === 'ArrowUp')) {
+        e.preventDefault();
+        jump();
+      }
+    });
+
+    function drawPanda() {
+      ctx.save();
+      // 걷기 애니메이션 (다리가 위아래로 살짝 흔들림)
+      const bob = panda.grounded && isRunning ? Math.sin(panda.frame * 0.35) * 2 : 0;
+      ctx.font = '26px serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      // 이모지가 왼쪽을 보므로 좌우 반전하여 오른쪽으로 뛰게 처리
+      ctx.translate(panda.x, panda.y + bob + 3);
+      ctx.scale(-1, 1);
+      ctx.fillText('🐼', 0, 0);
+      ctx.restore();
+    }
+
+    function drawBuilding(b) {
+      // 빌딩 본체
+      ctx.fillStyle = b.color;
+      ctx.fillRect(b.x, groundY - b.h, b.w, b.h);
+      // 빌딩 창문 디테일
+      ctx.fillStyle = '#fff9c4';
+      for (let wy = groundY - b.h + 5; wy < groundY - 6; wy += 9) {
+        for (let wx = b.x + 4; wx < b.x + b.w - 4; wx += 7) {
+          ctx.fillRect(wx, wy, 3, 4);
+        }
+      }
+    }
+
+    function update() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (isRunning && !isGameOver) {
+        panda.frame++;
+        panda.vy += panda.gravity;
+        panda.y += panda.vy;
+
+        if (panda.y >= groundY) {
+          panda.y = groundY;
+          panda.vy = 0;
+          panda.grounded = true;
+        }
+
+        // 빌딩 장애물 생성
+        spawnTimer--;
+        if (spawnTimer <= 0) {
+          const h = 22 + Math.floor(Math.random() * 20); // 높이 22~41px
+          const w = 18 + Math.floor(Math.random() * 12); // 너비 18~29px
+          const colors = ['#546e7a', '#607d8b', '#455a64', '#78909c'];
+          buildings.push({
+            x: canvas.width,
+            w: w,
+            h: h,
+            color: colors[Math.floor(Math.random() * colors.length)]
+          });
+          spawnTimer = 65 + Math.floor(Math.random() * 45);
+        }
+
+        // 빌딩 이동 및 충돌 판정
+        for (let i = buildings.length - 1; i >= 0; i--) {
+          const b = buildings[i];
+          b.x -= speed;
+          drawBuilding(b);
+
+          // 판다 히트박스 (여유 있게 설정하여 억울한 충돌 방지)
+          const pLeft = panda.x - 8;
+          const pRight = panda.x + 8;
+          const pBottom = panda.y - 2;
+
+          if (pRight > b.x && pLeft < b.x + b.w && pBottom > groundY - b.h) {
+            isGameOver = true;
+            if (score > hiScore) {
+              hiScore = score;
+              localStorage.setItem('panda-runner-hi', hiScore);
+              hiScoreEl.textContent = String(hiScore).padStart(4, '0');
+            }
+          }
+
+          if (b.x + b.w < 0) buildings.splice(i, 1);
+        }
+
+        score++;
+        if (score % 150 === 0) speed += 0.25; // 점수 오를수록 속도 증가
+        scoreEl.textContent = String(Math.floor(score / 5)).padStart(4, '0');
+      } else {
+        buildings.forEach(drawBuilding);
+      }
+
+      drawPanda();
+
+      // 안내 텍스트 오버레이
+      if (!isRunning || isGameOver) {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+        ctx.font = 'bold 14px monospace';
+        ctx.textAlign = 'center';
+        const msg = isGameOver ? 'GAME OVER - Click or Space to Restart' : 'CLICK TO START PANDA RUNNER';
+        ctx.fillText(msg, canvas.width / 2, 52);
+      }
+
+      requestAnimationFrame(update);
+    }
+
+    update();
+  })();
+</script>
 <!-- 접이식 플로팅 컨트롤 위젯 -->
 <div id="floating-widget-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
   <!-- 펼쳐지는 메뉴 패널 (기본 숨김) -->
