@@ -26,259 +26,271 @@
     {{- site.data.locales[include.lang].meta | replace: ':PLATFORM', '<a href="https://jekyllrb.com" target="_blank" rel="noopener">Jekyll</a>' | replace: ':THEME', '<a href="https://github.com/cotes2020/jekyll-theme-chirpy" target="_blank" rel="noopener">Chirpy</a>' -}}
   </p>
 </footer>
-<!-- Panda City Runner Mini-Game -->
-<div id="panda-game-container" style="
-  margin: 24px auto 12px auto;
+
+<!-- Panda City Runner Mini-Game (Vector Panda - 100% Visible) -->
+<div id="panda-game-wrapper" style="
+  margin: 20px auto 30px auto;
   max-width: 100%;
-  background: rgba(255, 255, 255, 0.75);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(0, 0, 0, 0.12);
   border-radius: 12px;
-  padding: 10px 14px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  text-align: center;
+  padding: 12px 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  position: relative;
+  z-index: 10;
 ">
-  <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #444; margin-bottom: 6px; font-family: monospace;">
-    <span>🐼 <b>Panda Runner</b> (Click or Space to Jump)</span>
+  <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #333; margin-bottom: 8px; font-family: monospace;">
+    <span><b>PANDA RUNNER</b> (Click box or press Space)</span>
     <span>HI: <b id="panda-hi-score">0000</b> | SCORE: <b id="panda-score">0000</b></span>
   </div>
-  <canvas id="panda-canvas" width="600" height="110" style="
+  <canvas id="panda-canvas" width="600" height="120" style="
     width: 100%;
-    height: 110px;
+    height: 120px;
     display: block;
-    background: linear-gradient(to bottom, #eef7f2 0%, #ffffff 85%, #d8e2dc 85%, #d8e2dc 100%);
+    background: linear-gradient(to bottom, #e8f5e9 0%, #ffffff 82%, #cfd8dc 82%, #cfd8dc 100%);
+    border: 1px solid #d0d7de;
     border-radius: 8px;
     cursor: pointer;
+    touch-action: manipulation;
   "></canvas>
 </div>
 
-<script>
-  (function () {
-    const canvas = document.getElementById('panda-canvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const scoreEl = document.getElementById('panda-score');
-    const hiScoreEl = document.getElementById('panda-hi-score');
+<!-- Minimal Floating Control Widget -->
+<div id="mini-control-wrapper" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; font-family: sans-serif;">
+  <button type="button" id="toggle-control-btn" title="Display Settings" style="
+    width: 38px; height: 38px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.15);
+    background: rgba(255,255,255,0.95); box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; margin-left: auto;
+  ">🐼</button>
 
-    let isRunning = false;
-    let isGameOver = false;
-    let isFocused = false;
-    let score = 0;
-    let hiScore = parseInt(localStorage.getItem('panda-runner-hi') || '0', 10);
-    hiScoreEl.textContent = String(hiScore).padStart(4, '0');
-
-    const groundY = 93;
-    const panda = { x: 45, y: groundY, vy: 0, gravity: 0.65, jumpPower: -10.5, grounded: true, frame: 0 };
-    let buildings = [];
-    let speed = 4.2;
-    let spawnTimer = 0;
-
-    function resetGame() {
-      buildings = [];
-      score = 0;
-      speed = 4.2;
-      spawnTimer = 0;
-      panda.y = groundY;
-      panda.vy = 0;
-      panda.grounded = true;
-      isGameOver = false;
-      isRunning = true;
-    }
-
-    function jump() {
-      if (!isRunning || isGameOver) {
-        resetGame();
-        return;
-      }
-      if (panda.grounded) {
-        panda.vy = panda.jumpPower;
-        panda.grounded = false;
-      }
-    }
-
-    // 마우스 클릭 / 모바일 터치
-    canvas.addEventListener('pointerdown', function (e) {
-      e.preventDefault();
-      isFocused = true;
-      jump();
-    });
-
-    // 다른 곳 클릭 시 키보드 포커스 해제 (블로그 스크롤 방해 방지)
-    document.addEventListener('pointerdown', function (e) {
-      if (e.target !== canvas) isFocused = false;
-    });
-
-    // 스페이스바 / 위쪽 화살표
-    window.addEventListener('keydown', function (e) {
-      if (isFocused && (e.code === 'Space' || e.code === 'ArrowUp')) {
-        e.preventDefault();
-        jump();
-      }
-    });
-
-    function drawPanda() {
-      ctx.save();
-      // 걷기 애니메이션 (다리가 위아래로 살짝 흔들림)
-      const bob = panda.grounded && isRunning ? Math.sin(panda.frame * 0.35) * 2 : 0;
-      ctx.font = '26px serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'bottom';
-      // 이모지가 왼쪽을 보므로 좌우 반전하여 오른쪽으로 뛰게 처리
-      ctx.translate(panda.x, panda.y + bob + 3);
-      ctx.scale(-1, 1);
-      ctx.fillText('🐼', 0, 0);
-      ctx.restore();
-    }
-
-    function drawBuilding(b) {
-      // 빌딩 본체
-      ctx.fillStyle = b.color;
-      ctx.fillRect(b.x, groundY - b.h, b.w, b.h);
-      // 빌딩 창문 디테일
-      ctx.fillStyle = '#fff9c4';
-      for (let wy = groundY - b.h + 5; wy < groundY - 6; wy += 9) {
-        for (let wx = b.x + 4; wx < b.x + b.w - 4; wx += 7) {
-          ctx.fillRect(wx, wy, 3, 4);
-        }
-      }
-    }
-
-    function update() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      if (isRunning && !isGameOver) {
-        panda.frame++;
-        panda.vy += panda.gravity;
-        panda.y += panda.vy;
-
-        if (panda.y >= groundY) {
-          panda.y = groundY;
-          panda.vy = 0;
-          panda.grounded = true;
-        }
-
-        // 빌딩 장애물 생성
-        spawnTimer--;
-        if (spawnTimer <= 0) {
-          const h = 22 + Math.floor(Math.random() * 20); // 높이 22~41px
-          const w = 18 + Math.floor(Math.random() * 12); // 너비 18~29px
-          const colors = ['#546e7a', '#607d8b', '#455a64', '#78909c'];
-          buildings.push({
-            x: canvas.width,
-            w: w,
-            h: h,
-            color: colors[Math.floor(Math.random() * colors.length)]
-          });
-          spawnTimer = 65 + Math.floor(Math.random() * 45);
-        }
-
-        // 빌딩 이동 및 충돌 판정
-        for (let i = buildings.length - 1; i >= 0; i--) {
-          const b = buildings[i];
-          b.x -= speed;
-          drawBuilding(b);
-
-          // 판다 히트박스 (여유 있게 설정하여 억울한 충돌 방지)
-          const pLeft = panda.x - 8;
-          const pRight = panda.x + 8;
-          const pBottom = panda.y - 2;
-
-          if (pRight > b.x && pLeft < b.x + b.w && pBottom > groundY - b.h) {
-            isGameOver = true;
-            if (score > hiScore) {
-              hiScore = score;
-              localStorage.setItem('panda-runner-hi', hiScore);
-              hiScoreEl.textContent = String(hiScore).padStart(4, '0');
-            }
-          }
-
-          if (b.x + b.w < 0) buildings.splice(i, 1);
-        }
-
-        score++;
-        if (score % 150 === 0) speed += 0.25; // 점수 오를수록 속도 증가
-        scoreEl.textContent = String(Math.floor(score / 5)).padStart(4, '0');
-      } else {
-        buildings.forEach(drawBuilding);
-      }
-
-      drawPanda();
-
-      // 안내 텍스트 오버레이
-      if (!isRunning || isGameOver) {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
-        ctx.font = 'bold 14px monospace';
-        ctx.textAlign = 'center';
-        const msg = isGameOver ? 'GAME OVER - Click or Space to Restart' : 'CLICK TO START PANDA RUNNER';
-        ctx.fillText(msg, canvas.width / 2, 52);
-      }
-
-      requestAnimationFrame(update);
-    }
-
-    update();
-  })();
-</script>
-<!-- 접이식 플로팅 컨트롤 위젯 -->
-<div id="floating-widget-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
-  <!-- 펼쳐지는 메뉴 패널 (기본 숨김) -->
-  <div id="opacity-control-box" style="display: none; position: static; margin-bottom: 4px;">
-    <a
-      href="https://app.pagescms.org/k1-tech/k1-tech.github.io/main/collection/posts"
-      target="_blank"
-      rel="noopener noreferrer"
-      style="display: block; text-align: center; background-color: #4caf50; color: #ffffff !important; font-weight: 700; padding: 6px 10px; border-radius: 8px; text-decoration: none; margin-bottom: 6px;"
-    >
-      ✍️ New Post / CMS
-    </a>
-    <label for="bg-opacity-slider">
-      <span>🐼 Overlay</span>
-      <span id="bg-opacity-val">88%</span>
-    </label>
-    <input type="range" id="bg-opacity-slider" min="0.2" max="1.0" step="0.02" value="0.88" />
+  <div id="opacity-control-box" style="
+    display: none; margin-top: 8px; background: rgba(255, 255, 255, 0.96);
+    border: 1px solid rgba(0, 0, 0, 0.15); border-radius: 10px; padding: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15); font-size: 12px; color: #1f2328; width: 175px;
+  ">
+    <div style="display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 6px;">
+      <span>Panel Opacity</span>
+      <span id="bg-opacity-val">92%</span>
+    </div>
+    <input type="range" id="bg-opacity-slider" min="0.5" max="1.0" step="0.02" value="0.92" style="width: 100%; cursor: pointer; accent-color: #2e7d32;" />
+    
+    <hr style="margin: 10px 0; border: 0; border-top: 1px solid #eee;" />
+    <a href="https://app.pagescms.org" target="_blank" rel="noopener noreferrer" style="
+      display: block; text-align: center; color: #444; text-decoration: none; font-size: 11px; font-weight: 500; padding: 5px; border-radius: 5px; background: #f3f4f6;
+    ">⚙️ Admin CMS</a>
   </div>
-
-  <!-- 토글 아이콘 버튼 -->
-  <button
-    id="widget-toggle-btn"
-    type="button"
-    title="블로그 설정 및 글쓰기"
-    style="width: 42px; height: 42px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.12); background: rgba(255,255,255,0.92); box-shadow: 0 4px 10px rgba(0,0,0,0.12); font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center;"
-  >
-    🐼
-  </button>
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const toggleBtn = document.getElementById('widget-toggle-btn');
-    const panel = document.getElementById('opacity-control-box');
-    const slider = document.getElementById('bg-opacity-slider');
-    const valLabel = document.getElementById('bg-opacity-val');
-    const root = document.documentElement;
+window.addEventListener('load', function () {
+  /* 1. Opacity & Toggle Control */
+  const toggleBtn = document.getElementById('toggle-control-btn');
+  const controlBox = document.getElementById('opacity-control-box');
+  const slider = document.getElementById('bg-opacity-slider');
+  const valLabel = document.getElementById('bg-opacity-val');
+  const root = document.documentElement;
 
-    // 패널 열기/닫기 토글
-    toggleBtn.addEventListener('click', function () {
-      panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
+  function applyOpacity(val) {
+    const mainAlpha = parseFloat(val);
+    const sidebarAlpha = Math.max(0.4, (mainAlpha - 0.08).toFixed(2));
+    const cardAlpha = Math.min(1.0, (mainAlpha + 0.04).toFixed(2));
+    root.style.setProperty('--main-alpha', mainAlpha);
+    root.style.setProperty('--sidebar-alpha', sidebarAlpha);
+    root.style.setProperty('--card-alpha', cardAlpha);
+    if (valLabel) valLabel.textContent = Math.round(mainAlpha * 100) + '%';
+    if (slider) slider.value = mainAlpha;
+  }
+
+  const savedOpacity = localStorage.getItem('blog-bg-opacity') || '0.92';
+  applyOpacity(savedOpacity);
+
+  if (toggleBtn && controlBox) {
+    toggleBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      controlBox.style.display = controlBox.style.display === 'none' ? 'block' : 'none';
     });
+  }
 
-    function applyOpacity(val) {
-      const mainAlpha = parseFloat(val);
-      const sidebarAlpha = Math.max(0.15, (mainAlpha - 0.10).toFixed(2));
-      const cardAlpha = Math.min(1.0, (mainAlpha + 0.04).toFixed(2));
-
-      root.style.setProperty('--main-alpha', mainAlpha);
-      root.style.setProperty('--sidebar-alpha', sidebarAlpha);
-      root.style.setProperty('--card-alpha', cardAlpha);
-      valLabel.textContent = Math.round(mainAlpha * 100) + '%';
-      slider.value = mainAlpha;
-    }
-
-    const saved = localStorage.getItem('blog-bg-opacity');
-    if (saved) applyOpacity(saved);
-
+  if (slider) {
     slider.addEventListener('input', function (e) {
       applyOpacity(e.target.value);
       localStorage.setItem('blog-bg-opacity', e.target.value);
     });
+  }
+
+  /* 2. Panda City Runner Game */
+  const canvas = document.getElementById('panda-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const scoreEl = document.getElementById('panda-score');
+  const hiScoreEl = document.getElementById('panda-hi-score');
+
+  let isRunning = false;
+  let isGameOver = false;
+  let isFocused = false;
+  let score = 0;
+  let hiScore = parseInt(localStorage.getItem('panda-runner-hi') || '0', 10);
+  if (hiScoreEl) hiScoreEl.textContent = String(hiScore).padStart(4, '0');
+
+  const groundY = 98;
+  const panda = { x: 50, y: groundY, vy: 0, gravity: 0.65, jumpPower: -10.5, grounded: true, frame: 0 };
+  let buildings = [];
+  let speed = 4.2;
+  let spawnTimer = 0;
+
+  function resetGame() {
+    buildings = [];
+    score = 0;
+    speed = 4.2;
+    spawnTimer = 0;
+    panda.y = groundY;
+    panda.vy = 0;
+    panda.grounded = true;
+    isGameOver = false;
+    isRunning = true;
+  }
+
+  function jump() {
+    if (!isRunning || isGameOver) {
+      resetGame();
+      return;
+    }
+    if (panda.grounded) {
+      panda.vy = panda.jumpPower;
+      panda.grounded = false;
+    }
+  }
+
+  // 클릭 시 상단 스크롤(이벤트 버블링) 완벽 차단
+  canvas.addEventListener('click', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    isFocused = true;
+    jump();
   });
-</script>
+
+  document.addEventListener('click', function (e) {
+    if (e.target !== canvas) isFocused = false;
+  });
+
+  window.addEventListener('keydown', function (e) {
+    if (isFocused && (e.code === 'Space' || e.code === 'ArrowUp')) {
+      e.preventDefault();
+      e.stopPropagation();
+      jump();
+    }
+  });
+
+  // 순수 캔버스 도형으로 귀여운 판다 캐릭터 직접 그리기 (폰트 의존성 제거)
+  function drawVectorPanda(x, y, frame, grounded) {
+    const legOffset = grounded && isRunning ? Math.sin(frame * 0.4) * 3 : 0;
+
+    // 다리 (검정)
+    ctx.fillStyle = '#222';
+    ctx.fillRect(x - 8, y - 8 + legOffset, 5, 8);
+    ctx.fillRect(x + 3, y - 8 - legOffset, 5, 8);
+
+    // 몸통 (흰색 + 검은 테두리)
+    ctx.fillStyle = '#ffffff';
+    ctx.strokeStyle = '#222';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(x, y - 14, 10, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // 팔/어깨 띠 (검정)
+    ctx.fillStyle = '#222';
+    ctx.fillRect(x - 9, y - 17, 18, 4);
+
+    // 귀 (검정)
+    ctx.beginPath();
+    ctx.arc(x - 8, y - 32, 4, 0, Math.PI * 2);
+    ctx.arc(x + 8, y - 32, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 머리 (흰색 + 검은 테두리)
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(x, y - 25, 10, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // 눈 반점 (검정) & 눈동자 (흰색)
+    ctx.fillStyle = '#222';
+    ctx.beginPath();
+    ctx.arc(x - 3.5, y - 26, 2.5, 0, Math.PI * 2);
+    ctx.arc(x + 4.5, y - 26, 2.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(x - 3, y - 27, 1.5, 1.5);
+    ctx.fillRect(x + 5, y - 27, 1.5, 1.5);
+
+    // 코 (검정)
+    ctx.fillStyle = '#222';
+    ctx.fillRect(x + 0.5, y - 23, 2.5, 1.5);
+  }
+
+  function drawBuilding(b) {
+    ctx.fillStyle = b.color;
+    ctx.fillRect(b.x, groundY - b.h, b.w, b.h);
+    ctx.fillStyle = '#fff59d';
+    for (let wy = groundY - b.h + 5; wy < groundY - 6; wy += 9) {
+      for (let wx = b.x + 4; wx < b.x + b.w - 4; wx += 7) {
+        ctx.fillRect(wx, wy, 3, 4);
+      }
+    }
+  }
+
+  function loop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (isRunning && !isGameOver) {
+      panda.frame++;
+      panda.vy += panda.gravity;
+      panda.y += panda.vy;
+
+      if (panda.y >= groundY) {
+        panda.y = groundY;
+        panda.vy = 0;
+        panda.grounded = true;
+      }
+
+      spawnTimer--;
+      if (spawnTimer <= 0) {
+        const h = 22 + Math.floor(Math.random() * 20);
+        const w = 18 + Math.floor(Math.random() * 12);
+        const colors = ['#546e7a', '#607d8b', '#455a64', '#78909c'];
+        buildings.push({
+          x: canvas.width,
+          w: w,
+          h: h,
+          color: colors[Math.floor(Math.random() * colors.length)]
+        });
+        spawnTimer = 65 + Math.floor(Math.random() * 45);
+      }
+
+      for (let i = buildings.length - 1; i >= 0; i--) {
+        const b = buildings[i];
+        b.x -= speed;
+        drawBuilding(b);
+
+        if (panda.x + 7 > b.x && panda.x - 7 < b.x + b.w && panda.y - 2 > groundY - b.h) {
+          isGameOver = true;
+          const finalScore = Math.floor(score / 5);
+          if (finalScore > hiScore) {
+            hiScore = finalScore;
+            localStorage.setItem('panda-runner-hi', hiScore);
+            if (hiScoreEl) hiScoreEl.textContent = String(hiScore).padStart(4, '0');
+          }
+        }
+        if (b.x + b.w < 0) buildings.splice(i, 1);
+      }
+
+      score++;
+      if (score % 150 === 0) speed += 0.25;
+      if (scoreEl) scoreEl.textContent = String(Math.floor(score / 5)).padStart(4, '0');
+    } else {
+      buildings.forEach(
