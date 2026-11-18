@@ -3,7 +3,7 @@ media:
   output: /assets/img/posts
 content:
   - name: posts
-    label: 블로그 글 (Posts)
+    label: Title, Date, Categories, Tags, Content
     path: _posts
     type: collection
     filename: '{year}-{month}-{day}-{primary}.md'
