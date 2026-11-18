@@ -14,7 +14,7 @@ timezone: Asia/Taipei
 
 title: K1 Lab # the main title
 
-tagline: bruh bruh # it will display as the subtitle
+tagline: Basic Bioinformatics (DNA), Linux & Cloud Log # it will display as the subtitle
 
 description: >- # used by seo meta and the atom feed
   A minimal, responsive and feature-rich Jekyll theme for technical writing.
@@ -31,7 +31,7 @@ twitter:
 social:
   name: Kay Won Park
   email: parkkaywon@gmail.com
-  fediverse_handle: 
+  fediverse_handle: idk
   links:
     - https://twitter.com/username
     - https://github.com/K1-tech/
@@ -76,7 +76,7 @@ theme_mode: light
 cdn:
 
 # the avatar on sidebar, support local or CORS resources
-avatar:
+avatar: /assets/img/avatar.png
 
 # The URL of the site-wide social preview image
 social_preview_image: 
