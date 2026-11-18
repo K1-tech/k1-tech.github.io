@@ -294,3 +294,175 @@ window.addEventListener('load', function () {
       if (scoreEl) scoreEl.textContent = String(Math.floor(score / 5)).padStart(4, '0');
     } else {
       buildings.forEach(
+
+  <!-- Seasonal Auto-Effect Overlay (Snow / New Year Confetti) -->
+<div id="season-banner" style="
+  display: none;
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9998;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 999px;
+  padding: 6px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1f2328;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  pointer-events: auto;
+  align-items: center;
+  gap: 10px;
+">
+  <span id="season-text"></span>
+  <button id="close-season-btn" style="
+    border: none; background: transparent; color: #888; font-weight: bold; cursor: pointer; font-size: 14px; padding: 0 2px;
+  ">×</button>
+</div>
+
+<canvas id="season-canvas" style="
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none; /* 클릭을 방해하지 않고 통과시킴 */
+  z-index: 9997;
+"></canvas>
+
+<script>
+(function () {
+  const canvas = document.getElementById('season-canvas');
+  const banner = document.getElementById('season-banner');
+  const bannerText = document.getElementById('season-text');
+  const closeBtn = document.getElementById('close-season-btn');
+  if (!canvas || !banner) return;
+
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  let animId = null;
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // 날짜 자동 판별 함수
+  function detectSeason() {
+    const now = new Date();
+    const m = now.getMonth() + 1; // 1 ~ 12
+    const d = now.getDate();      // 1 ~ 31
+
+    if (m === 12 && d >= 20 && d <= 26) return 'christmas';
+    if ((m === 12 && d === 31) || (m === 1 && d >= 1 && d <= 3)) return 'newyear';
+    if (m === 10 && d >= 28 && d <= 31) return 'halloween';
+    return null;
+  }
+
+  function startSeasonEffect(type) {
+    if (!type) return;
+    if (animId) cancelAnimationFrame(animId);
+    particles = [];
+
+    const config = {
+      christmas: {
+        msg: '🎄 Merry Christmas! Happy Holidays from K1 Tech',
+        count: 55,
+        colors: ['#ffffff', '#e3f2fd', '#bbdefb']
+      },
+      newyear: {
+        msg: `🎆 Happy New Year ${new Date().getFullYear()}! Wishing you a great year`,
+        count: 65,
+        colors: ['#ff5252', '#ffd740', '#69f0ae', '#40c4ff', '#e040fb']
+      },
+      halloween: {
+        msg: '🎃 Happy Halloween! Spooky Bio & Tech Notes',
+        count: 45,
+        colors: ['#ff9800', '#9c27b0', '#ffeb3b']
+      }
+    }[type];
+
+    bannerText.textContent = config.msg;
+    banner.style.display = 'flex';
+
+    for (let i = 0; i < config.count; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        r: type === 'christmas' ? (Math.random() * 3 + 2) : (Math.random() * 5 + 3),
+        vx: (Math.random() - 0.5) * 1.2,
+        vy: Math.random() * 1.5 + 0.8,
+        color: config.colors[Math.floor(Math.random() * config.colors.length)],
+        angle: Math.random() * 360
+      });
+    }
+
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.angle += 2;
+
+        if (p.y > canvas.height) {
+          p.y = -10;
+          p.x = Math.random() * canvas.width;
+        }
+
+        ctx.save();
+        ctx.fillStyle = p.color;
+        if (type === 'christmas') {
+          // 눈송이 (원형)
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          // 새해/할로윈 꽃가루 (회전하는 사각형)
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.angle * Math.PI) / 180);
+          ctx.fillRect(-p.r / 2, -p.r / 2, p.r, p.r * 0.6);
+        }
+        ctx.restore();
+      }
+      animId = requestAnimationFrame(render);
+    }
+    render();
+  }
+
+  // 닫기 버튼 클릭 시 효과 정지
+  closeBtn.addEventListener('click', function () {
+    banner.style.display = 'none';
+    if (animId) cancelAnimationFrame(animId);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  });
+
+  // 1. 실제 날짜 기반 자동 실행
+  const currentSeason = detectSeason();
+  if (currentSeason) {
+    startSeasonEffect(currentSeason);
+  }
+
+  // 2. 우측 하단 설정 박스(🐼)에 미리보기 버튼 자동 주입
+  window.addEventListener('load', function () {
+    const controlBox = document.getElementById('opacity-control-box');
+    if (controlBox) {
+      const testDiv = document.createElement('div');
+      testDiv.style.marginTop = '8px';
+      testDiv.style.display = 'flex';
+      testDiv.style.gap = '4px';
+      testDiv.innerHTML = `
+        <button type="button" id="preview-xmas" style="flex:1; font-size:11px; padding:4px; border:1px solid #ddd; border-radius:4px; background:#fff; cursor:pointer;">🎄 Xmas</button>
+        <button type="button" id="preview-ny" style="flex:1; font-size:11px; padding:4px; border:1px solid #ddd; border-radius:4px; background:#fff; cursor:pointer;">🎆 Jan 1</button>
+      `;
+      controlBox.appendChild(testDiv);
+
+      document.getElementById('preview-xmas').addEventListener('click', () => startSeasonEffect('christmas'));
+      document.getElementById('preview-ny').addEventListener('click', () => startSeasonEffect('newyear'));
+    }
+  });
+})();
+</script>
