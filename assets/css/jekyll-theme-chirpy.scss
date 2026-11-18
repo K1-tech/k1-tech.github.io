@@ -1,1 +1,36 @@
+---
+---
 
+@import 'main';
+
+/* 1. 전체 배경에 판다와 동물 일러스트 적용 */
+body {
+  background-image: url('/assets/img/panda-animals-bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed; /* 스크롤해도 배경은 움직이지 않도록 고정 */
+}
+
+/* 2. 블로그 본문 가독성을 위한 반투명 처리 (배경이 비치되, 글씨는 잘 보이도록) */
+#main-wrapper {
+  background-color: rgba(255, 255, 255, 0.88); /* 연한 불투명 흰색 */
+  border-radius: 12px; /* 모서리를 둥글게 만들어 귀여운 느낌 추가 */
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); /* 은은한 그림자 */
+}
+
+/* 다크 모드일 때 본문 영역 처리 */
+html[data-mode="dark"] #main-wrapper {
+  background-color: rgba(27, 27, 30, 0.90);
+}
+
+/* 3. 왼쪽 사이드바 영역도 약간의 반투명을 주어 배경과 조화롭게 */
+#sidebar {
+  background-color: rgba(255, 255, 255, 0.65) !important;
+  border-right: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+html[data-mode="dark"] #sidebar {
+  background-color: rgba(27, 27, 30, 0.80) !important;
+}
