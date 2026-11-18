@@ -27,40 +27,48 @@
   </p>
 </footer>
 
-<!-- 우측 하단 플로팅 위젯: 글쓰기 버튼 + 배경 투명도 조절 -->
-<div id="opacity-control-box">
-  <a
-    href="https://app.pagescms.org"
-    target="_blank"
-    rel="noopener noreferrer"
-    style="
-      display: block;
-      text-align: center;
-      background-color: #4caf50;
-      color: #ffffff !important;
-      font-weight: 700;
-      padding: 6px 10px;
-      border-radius: 8px;
-      text-decoration: none;
-      margin-bottom: 4px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    "
-  >
-    ✍️ 글쓰기 / 관리
-  </a>
+<!-- 접이식 플로팅 컨트롤 위젯 -->
+<div id="floating-widget-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+  <!-- 펼쳐지는 메뉴 패널 (기본 숨김) -->
+  <div id="opacity-control-box" style="display: none; position: static; margin-bottom: 4px;">
+    <a
+      href="https://app.pagescms.org/k1-tech/k1-tech.github.io/main/collection/posts"
+      target="_blank"
+      rel="noopener noreferrer"
+      style="display: block; text-align: center; background-color: #4caf50; color: #ffffff !important; font-weight: 700; padding: 6px 10px; border-radius: 8px; text-decoration: none; margin-bottom: 6px;"
+    >
+      ✍️ 새 글 작성 / 관리
+    </a>
+    <label for="bg-opacity-slider">
+      <span>🐼 배경 가림막</span>
+      <span id="bg-opacity-val">88%</span>
+    </label>
+    <input type="range" id="bg-opacity-slider" min="0.2" max="1.0" step="0.02" value="0.88" />
+  </div>
 
-  <label for="bg-opacity-slider">
-    <span>🐼 배경 가림막</span>
-    <span id="bg-opacity-val">88%</span>
-  </label>
-  <input type="range" id="bg-opacity-slider" min="0.2" max="1.0" step="0.02" value="0.88" />
+  <!-- 토글 아이콘 버튼 -->
+  <button
+    id="widget-toggle-btn"
+    type="button"
+    title="블로그 설정 및 글쓰기"
+    style="width: 42px; height: 42px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.12); background: rgba(255,255,255,0.92); box-shadow: 0 4px 10px rgba(0,0,0,0.12); font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center;"
+  >
+    🐼
+  </button>
 </div>
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
+    const toggleBtn = document.getElementById('widget-toggle-btn');
+    const panel = document.getElementById('opacity-control-box');
     const slider = document.getElementById('bg-opacity-slider');
     const valLabel = document.getElementById('bg-opacity-val');
     const root = document.documentElement;
+
+    // 패널 열기/닫기 토글
+    toggleBtn.addEventListener('click', function () {
+      panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
+    });
 
     function applyOpacity(val) {
       const mainAlpha = parseFloat(val);
@@ -75,9 +83,7 @@
     }
 
     const saved = localStorage.getItem('blog-bg-opacity');
-    if (saved) {
-      applyOpacity(saved);
-    }
+    if (saved) applyOpacity(saved);
 
     slider.addEventListener('input', function (e) {
       applyOpacity(e.target.value);
