@@ -3,7 +3,7 @@
 
 @import 'main';
 
-/* 1. 최상위 html 및 body에 판다 배경 적용 */
+/* 1. 최상위 배경: 판다 일러스트 원본 그대로 선명하게 표시 */
 html, body {
   background-image: url('/assets/img/panda-animals-bg.jpg') !important;
   background-size: cover !important;
@@ -11,27 +11,37 @@ html, body {
   background-repeat: no-repeat !important;
   background-attachment: fixed !important;
   background-color: transparent !important;
+  color: #222222 !important;
 }
 
-/* 2. Chirpy 기본 불투명 배경 레이어들 투명화/반투명화 */
+/* 2. 본문 및 상하단 영역: 배경이 은은하게 비치도록 투명도 낮춤 (0.82 -> 0.55) */
 #main-wrapper,
 #topbar-wrapper,
-footer {
-  background-color: rgba(255, 255, 255, 0.82) !important;
-}
-
-/* 3. 다크 모드일 때의 반투명 처리 */
+footer,
 html[data-mode="dark"] #main-wrapper,
 html[data-mode="dark"] #topbar-wrapper,
 html[data-mode="dark"] footer {
-  background-color: rgba(27, 27, 30, 0.85) !important;
+  background-color: rgba(255, 255, 255, 0.55) !important;
+  color: #222222 !important;
 }
 
-/* 4. 좌측 사이드바 영역 반투명 처리 */
-#sidebar {
-  background-color: rgba(255, 255, 255, 0.65) !important;
-}
-
+/* 3. 좌측 사이드바 영역: 왼쪽 판다 일러스트가 잘 보이도록 더 투명하게 처리 */
+#sidebar,
 html[data-mode="dark"] #sidebar {
-  background-color: rgba(27, 27, 30, 0.78) !important;
+  background-color: rgba(255, 255, 255, 0.35) !important;
+  border-right: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+/* 4. 다크 모드일 때 글씨/제목/메뉴가 회색으로 뜨는 현상 강제 수정 */
+#main-wrapper h1, #main-wrapper h2, #main-wrapper h3, #main-wrapper h4,
+#main-wrapper p, #main-wrapper li, #main-wrapper span, #main-wrapper a,
+#sidebar .site-title, #sidebar .site-subtitle, #sidebar .nav-link,
+#topbar-wrapper #breadcrumb, #topbar-wrapper a {
+  color: #1f2328 !important;
+}
+
+/* 5. 게시글 카드(목록) 배경도 반투명 흰색으로 통일 */
+#post-list .card {
+  background-color: rgba(255, 255, 255, 0.72) !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
 }
