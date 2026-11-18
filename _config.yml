@@ -17,8 +17,9 @@ title: K1 Lab # the main title
 tagline: Basic Bioinformatics (DNA), Linux & Cloud Log # it will display as the subtitle
 
 description: >- # used by seo meta and the atom feed
-  A minimal, responsive and feature-rich Jekyll theme for technical writing.
-
+  Technical portfolio and study log covering bioinformatics, NGS data analysis,
+  Linux CLI workflows, cloud computing, and some computer science knowledge that connect with other science.
+  It can be Biotechnology, Nutrition and others.
 # Fill in the protocol & hostname for your site.
 url: "https://k1-tech.github.io"
 
