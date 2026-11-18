@@ -3,29 +3,35 @@
 
 @import 'main';
 
-/* 1. 전체 화면 배경 강제 적용 */
+/* 1. 최상위 html 및 body에 판다 배경 적용 */
 html, body {
   background-image: url('/assets/img/panda-animals-bg.jpg') !important;
   background-size: cover !important;
   background-position: center !important;
   background-repeat: no-repeat !important;
   background-attachment: fixed !important;
+  background-color: transparent !important;
 }
 
-/* 2. 본문 영역 반투명 처리 (가독성 확보) */
-#main-wrapper {
-  background-color: rgba(255, 255, 255, 0.85) !important;
+/* 2. Chirpy 기본 불투명 배경 레이어들 투명화/반투명화 */
+#main-wrapper,
+#topbar-wrapper,
+footer {
+  background-color: rgba(255, 255, 255, 0.82) !important;
 }
 
-html[data-mode="dark"] #main-wrapper {
-  background-color: rgba(27, 27, 30, 0.88) !important;
+/* 3. 다크 모드일 때의 반투명 처리 */
+html[data-mode="dark"] #main-wrapper,
+html[data-mode="dark"] #topbar-wrapper,
+html[data-mode="dark"] footer {
+  background-color: rgba(27, 27, 30, 0.85) !important;
 }
 
-/* 3. 좌측 사이드바 반투명 처리 */
+/* 4. 좌측 사이드바 영역 반투명 처리 */
 #sidebar {
   background-color: rgba(255, 255, 255, 0.65) !important;
 }
 
 html[data-mode="dark"] #sidebar {
-  background-color: rgba(27, 27, 30, 0.80) !important;
+  background-color: rgba(27, 27, 30, 0.78) !important;
 }
