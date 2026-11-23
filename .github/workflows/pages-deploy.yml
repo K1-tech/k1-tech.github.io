@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+      schedule:
+    # 매일 대만 시간(CST, UTC+8) 오전 9시(UTC 01:00)에 자동 재빌드
+    - cron: '0 1 * * *'
       - master
     paths-ignore:
       - '.gitignore'
