@@ -52,12 +52,7 @@ webmaster_verifications:
 # Web Analytics Settings
 analytics:
   google:
-    id: <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-M5Q2F7ZB"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-</script>
+    id: GTM-M5Q2F7ZB
   goatcounter:
     id: <script data-goatcounter="https://k1techgithub.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
