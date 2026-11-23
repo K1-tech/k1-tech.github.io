@@ -6,7 +6,7 @@ categories: Bioinformatics, Basic Structural Biology, Ubuntu
 tags: ONT, Flye, DFAST, Prophage, Endolysin, AlphaFold3, Foldseek, WSL2, Ubuntu,
   first small project
 ---
-1. Project Overview & Objective 
+1. Project Overview & Objective
 
 Public repositories like NCBI SRA contain vast amounts of raw sequencing data from newly isolated environmental strains that have not yet been assembled or functionally characterized. In this project, I did an end-to-end comparative genomics and structural bioinformatics pipeline on an uncharacterized Oxford Nanopore Technologies (ONT) dataset: *Pseudomonas* sp. NIFoS 1045 `PRJNA1563381` / `SRR41839919`). * 
 
@@ -96,11 +96,10 @@ Figure 2. Foldseek structural homology hits against PDB100, demonstrating 100% p
 
 ---
 
- 6. Supplementary Data & Reproducibility
+6. Supplementary Data & Reproducibility
 
 The extracted amino acid sequence and AlphaFold 3 predicted 3D atomic coordinates are available for direct download and visualization (e.g., via UCSF ChimeraX, PyMOL, or Mol*):
 
-* **Target Endolysin Sequence (FASTA):** `LOCUS_32430.faa`](/assets/data/LOCUS_32430.faa)
-
-* **AlphaFold 3 Predicted 3D Structure (mmCIF):** `LOCUS_32430.cif`](/assets/data/LOCUS_32430.cif.cif)
+- **Target Endolysin Sequence (FASTA):** `LOCUS_32430.faa`](/assets/data/LOCUS_32430.faa)
+- **AlphaFold 3 Predicted 3D Structure (mmCIF):** `LOCUS_32430.cif`](/assets/data/LOCUS_32430.cif.cif)
 
