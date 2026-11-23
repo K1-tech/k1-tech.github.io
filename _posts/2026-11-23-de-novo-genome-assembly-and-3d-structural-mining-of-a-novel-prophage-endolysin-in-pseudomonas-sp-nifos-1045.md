@@ -106,4 +106,8 @@ The extracted amino acid sequence and AlphaFold 3 predicted 3D atomic coordinate
 
 - **Target Endolysin Sequence (FASTA):** `LOCUS_32430.faa`](/assets/data/LOCUS_32430.faa)
 - **AlphaFold 3 Predicted 3D Structure (mmCIF):** `LOCUS_32430.cif`](/assets/data/LOCUS_32430.cif.cif)
+- [https://search.foldseek.com/result/Mil8vYvFeofG3ekfewNwqQumZ-ywGRl_Mj63hQ/0](https://search.foldseek.com/result/Mil8vYvFeofG3ekfewNwqQumZ-ywGRl_Mj63hQ/0)
+- [https://dfast.ddbj.nig.ac.jp/analysis/annotation/3c3f426f-ef9f-4bad-8fc3-1af688709096](https://dfast.ddbj.nig.ac.jp/analysis/annotation/3c3f426f-ef9f-4bad-8fc3-1af688709096)
+- [https://www.ncbi.nlm.nih.gov/Traces/?view=run_browser&acc=SRR41839919&display=metadata](https://www.ncbi.nlm.nih.gov/Traces/?view=run_browser&acc=SRR41839919&display=metadata)
+- [https://alphafoldserver.com/fold/36f6842b982778a7](https://alphafoldserver.com/fold/36f6842b982778a7)
 
