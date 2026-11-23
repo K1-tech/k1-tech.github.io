@@ -6,6 +6,10 @@ categories: Bioinformatics, Basic Structural Biology, Ubuntu
 tags: ONT, Flye, DFAST, Prophage, Endolysin, AlphaFold3, Foldseek, WSL2, Ubuntu,
   first small project
 ---
+> **Note / Study Log Disclaimer:** This post documents an exploratory, self-directed undergraduate bioinformatics workflow conducted on publicly available sequencing data `SRR41839919`). AI-assisted scripting was utilized to navigate Linux environment constraints and pipeline syntax, while all genomic assembly, annotation, and 3D structural predictions were executed using standard computational tools `Flye`, `DFAST`, `AlphaFold 3`, and `Foldseek`). The findings presented here represent preliminary *in silico* observations for educational and portfolio purposes and have not undergone experimental wet-lab validation.
+
+{: .prompt-info }
+
 1. Project Overview & Objective
 
 Public repositories like NCBI SRA contain vast amounts of raw sequencing data from newly isolated environmental strains that have not yet been assembled or functionally characterized. In this project, I did an end-to-end comparative genomics and structural bioinformatics pipeline on an uncharacterized Oxford Nanopore Technologies (ONT) dataset: *Pseudomonas* sp. NIFoS 1045 `PRJNA1563381` / `SRR41839919`). * 
